@@ -7,11 +7,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @Disabled
 @Autonomous
-public class HelloWorld extends OpMode {
+public class Biobuzz extends OpMode {
 
     @Override
     public void init() {
-        telemetry.addData("Hello:","Mohammad"); //My First Comment
+        telemetry.addData("Hello:","Jd"); //My First Comment
     }
 
     @Override
