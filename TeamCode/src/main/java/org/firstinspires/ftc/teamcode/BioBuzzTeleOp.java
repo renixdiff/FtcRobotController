@@ -3,21 +3,14 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-/**
- * Driver-control TeleOp using BioBuzzHardware. All controls on gamepad 1:
- * left stick = drive/strafe, right stick X = turn,
- * right trigger = intake, left trigger = eject,
- * A = open scoring gate, B = close scoring gate.
- */
 @TeleOp(name = "BioBuzz: Driver Control", group = "BioBuzz")
 public class BioBuzzTeleOp extends LinearOpMode {
 
-    private static final double TRIGGER_DEADZONE = 0.05;
-
-    private final BioBuzzHardware robot = new BioBuzzHardware();
+    BioBuzzHardware robot = new BioBuzzHardware();
 
     @Override
     public void runOpMode() {
+
         robot.init(hardwareMap);
 
         telemetry.addData("Status", "Initialized");
@@ -26,60 +19,62 @@ public class BioBuzzTeleOp extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            // MECANUM DRIVE (stick Y is negative when pushed forward, so invert it)
+
+            // MECANUM DRIVE
 
             double drive = -gamepad1.left_stick_y;
             double strafe = gamepad1.left_stick_x;
             double turn = gamepad1.right_stick_x;
 
-            double fl = drive + strafe + turn;
-            double fr = drive - strafe - turn;
-            double bl = drive - strafe + turn;
-            double br = drive + strafe - turn;
+            double leftFrontPower = drive + strafe + turn;
+            double rightFrontPower = drive - strafe - turn;
+            double leftBackPower = drive - strafe + turn;
+            double rightBackPower = drive + strafe - turn;
 
-            // Scale all wheels together so no power exceeds 1.0 and direction is preserved.
-            double max = Math.max(1.0,
-                    Math.max(Math.max(Math.abs(fl), Math.abs(fr)),
-                             Math.max(Math.abs(bl), Math.abs(br))));
+            // Keeps all powers under 1.0
+            double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+            max = Math.max(max, Math.abs(leftBackPower));
+            max = Math.max(max, Math.abs(rightBackPower));
 
-            robot.leftFront.setPower(fl / max);
-            robot.rightFront.setPower(fr / max);
-            robot.leftBack.setPower(bl / max);
-            robot.rightBack.setPower(br / max);
+            if (max > 1.0) {
+                leftFrontPower /= max;
+                rightFrontPower /= max;
+                leftBackPower /= max;
+                rightBackPower /= max;
+            }
 
-            // POLLEN INTAKE (right trigger collects, left trigger ejects)
+            robot.leftFront.setPower(leftFrontPower);
+            robot.rightFront.setPower(rightFrontPower);
+            robot.leftBack.setPower(leftBackPower);
+            robot.rightBack.setPower(rightBackPower);
 
-            if (gamepad1.right_trigger > TRIGGER_DEADZONE) {
+            // POLLEN INTAKE
+
+            if (gamepad1.right_trigger > 0.05) {
                 robot.pollenIntake.setPower(gamepad1.right_trigger);
-            } else if (gamepad1.left_trigger > TRIGGER_DEADZONE) {
+            } else if (gamepad1.left_trigger > 0.05) {
                 robot.pollenIntake.setPower(-gamepad1.left_trigger);
             } else {
                 robot.pollenIntake.setPower(0);
             }
 
-            // SCORING GATE (A opens, B closes)
+            // SCORING GATE
 
             if (gamepad1.a) {
-                robot.scoringGate.setPosition(BioBuzzHardware.GATE_OPEN);
+                robot.scoringGate.setPosition(1.0);
             } else if (gamepad1.b) {
-                robot.scoringGate.setPosition(BioBuzzHardware.GATE_CLOSED);
+                robot.scoringGate.setPosition(0.0);
             }
 
             // TELEMETRY
 
-            telemetry.addData("Front Left Power", "%.2f", robot.leftFront.getPower());
-            telemetry.addData("Front Right Power", "%.2f", robot.rightFront.getPower());
-            telemetry.addData("Back Left Power", "%.2f", robot.leftBack.getPower());
-            telemetry.addData("Back Right Power", "%.2f", robot.rightBack.getPower());
-            telemetry.addData("Pollen Intake Power", "%.2f", robot.pollenIntake.getPower());
-            telemetry.addData("Scoring Gate Position", "%.2f", robot.scoringGate.getPosition());
+            telemetry.addData("Left Front Power", robot.leftFront.getPower());
+            telemetry.addData("Right Front Power", robot.rightFront.getPower());
+            telemetry.addData("Left Back Power", robot.leftBack.getPower());
+            telemetry.addData("Right Back Power", robot.rightBack.getPower());
+            telemetry.addData("Pollen Intake Power", robot.pollenIntake.getPower());
+            telemetry.addData("Scoring Gate Position", robot.scoringGate.getPosition());
             telemetry.update();
         }
-
-        robot.leftFront.setPower(0);
-        robot.rightFront.setPower(0);
-        robot.leftBack.setPower(0);
-        robot.rightBack.setPower(0);
-        robot.pollenIntake.setPower(0);
     }
 }
