@@ -42,10 +42,10 @@ public class BioBuzzTeleOp extends LinearOpMode {
                     Math.max(Math.max(Math.abs(fl), Math.abs(fr)),
                              Math.max(Math.abs(bl), Math.abs(br))));
 
-            robot.frontLeft.setPower(fl / max);
-            robot.frontRight.setPower(fr / max);
-            robot.backLeft.setPower(bl / max);
-            robot.backRight.setPower(br / max);
+            robot.leftFront.setPower(fl / max);
+            robot.rightFront.setPower(fr / max);
+            robot.leftBack.setPower(bl / max);
+            robot.rightBack.setPower(br / max);
 
             // POLLEN INTAKE (right trigger collects, left trigger ejects)
 
@@ -67,19 +67,19 @@ public class BioBuzzTeleOp extends LinearOpMode {
 
             // TELEMETRY
 
-            telemetry.addData("Front Left Power", "%.2f", robot.frontLeft.getPower());
-            telemetry.addData("Front Right Power", "%.2f", robot.frontRight.getPower());
-            telemetry.addData("Back Left Power", "%.2f", robot.backLeft.getPower());
-            telemetry.addData("Back Right Power", "%.2f", robot.backRight.getPower());
+            telemetry.addData("Front Left Power", "%.2f", robot.leftFront.getPower());
+            telemetry.addData("Front Right Power", "%.2f", robot.rightFront.getPower());
+            telemetry.addData("Back Left Power", "%.2f", robot.leftBack.getPower());
+            telemetry.addData("Back Right Power", "%.2f", robot.rightBack.getPower());
             telemetry.addData("Pollen Intake Power", "%.2f", robot.pollenIntake.getPower());
             telemetry.addData("Scoring Gate Position", "%.2f", robot.scoringGate.getPosition());
             telemetry.update();
         }
 
-        robot.frontLeft.setPower(0);
-        robot.frontRight.setPower(0);
-        robot.backLeft.setPower(0);
-        robot.backRight.setPower(0);
+        robot.leftFront.setPower(0);
+        robot.rightFront.setPower(0);
+        robot.leftBack.setPower(0);
+        robot.rightBack.setPower(0);
         robot.pollenIntake.setPower(0);
     }
 }
